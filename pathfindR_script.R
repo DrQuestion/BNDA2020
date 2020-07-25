@@ -41,5 +41,6 @@ output_df <- run_pathfindR(input = input_df,
                            custom_genes = ath_kegg_genes,
                            custom_descriptions = ath_kegg_descriptions,
                            pin_name_path = "C:/Users/aless/Downloads/at.pin.filt.sif")
-clustered <- cluster_enriched_terms(output_df)
+clustered <- cluster_enriched_terms(output_df, use_description = TRUE)
 term_gene_graph(output_df, use_description = TRUE)
+enrichment_chart(output_df)

@@ -35,16 +35,18 @@ rm(gse)
 ex <- ex[which(apply(ex, 1, var) != 0), ]
 dim(ex)
 
-# box plot
-boxplot(ex)
-boxplot(scale(ex))
-
 # filter genes by t-test
 tt <- rowttests(ex, as.factor(pheno$`treatment:ch1`))
 keepers <- which(p.adjust(tt$p.value, method = 'bonferroni')<0.1)
 keepers <- which(tt$p.value<0.1)
 filt_ex <- ex[keepers,]
 dim(filt_ex)
+
+# box plot
+boxplot(ex, ylab='expression values', xaxt = 'n', main='Unnormalized data')
+boxplot(scale(ex), ylab='expression values', xaxt = 'n', main='Normalized data')
+boxplot(filt_ex)
+boxplot(scale(filt_ex))
 
 # pca
 pca<-PCA(t(ex), graph = F)
@@ -54,6 +56,8 @@ fviz_pca_ind(pca, geom = 'point', col.ind = as.factor(pheno$`treatment:ch1`), ad
 
 filt_pca <- PCA(t(filt_ex), graph = F)
 fviz_pca_ind(filt_pca, geom = 'point', col.ind = as.factor(pheno$`treatment:ch1`), addEllipses = TRUE, legend.title = 'Condition', ellipse.level=0.69, mean.point = F, res=1000)
+
+
 
 #k-means
 ##k selection by silhouette
@@ -169,11 +173,6 @@ auc_lasso <- auc(as.numeric(as.factor(pred_lasso)),
 svmfit <- svm(CONDITION ~ ., data = filt_train_cond, kernel = "linear", cost = 10, scale = FALSE, type = "C")
 svmpred <- predict(svmfit, filt_test_cond)
 svmconf <- table(svmpred, test_pheno$`treatment:ch1`)
-
-#naiveBayes
-nbfit <- naiveBayes(CONDITION ~ ., data = filt_train_cond)
-nbpred <- predict(nbfit, filt_test_cond)
-nbconf <- table(nbpred, test_pheno$`treatment:ch1`)
 
 # rScudo
 trainRes <- scudoTrain(train, groups = as.factor(train_pheno$`treatment:ch1`),
